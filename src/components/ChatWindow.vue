@@ -59,4 +59,10 @@ export default defineComponent({
   padding: 10px;
   margin-bottom: 10px;
 }
+
+@media (max-width: 570px) {
+  .chat-window {
+    max-width: 350px;
+  }
+}
 </style>
