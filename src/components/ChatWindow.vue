@@ -13,10 +13,9 @@
 </template>
 
 <script>
-import {defineComponent} from 'vue';
+import { defineComponent, ref, onMounted, onUnmounted } from 'vue';
 import MessageBox from '@/components/MessageBox';
 import ChatInput from '@/components/ChatInput';
-
 import { useMessagesStore } from '@/store/messagesStore';
 
 export default defineComponent({
@@ -27,9 +26,34 @@ export default defineComponent({
   },
   setup() {
     const messagesStore = useMessagesStore();
+    const ws = ref(null);  // WebSocket reference
+
+    onMounted(() => {
+      ws.value = new WebSocket('ws://localhost:3000');
+
+      ws.value.onopen = () => {
+        console.log('Connected to the WebSocket');
+      };
+
+      // When a message is received from the server
+      ws.value.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+        messagesStore.addMessage(message.content, message.userId);  // Add to local messages
+      };
+    });
 
     const addMessage = (content, userId) => {
-      messagesStore.addMessage(content, userId);
+      const message = {
+        id: Date.now(),
+        content: content,
+        userId: userId
+      };
+
+      if (ws.value && ws.value.readyState === WebSocket.OPEN) {
+        ws.value.send(JSON.stringify(message));  // Send the message to the WebSocket server
+      }
+
+      messagesStore.addMessage(content, userId);  // Add to local messages as well
     };
 
     const deleteMessage = (id) => {
@@ -37,8 +61,14 @@ export default defineComponent({
     };
 
     const deleteAllMessages = () => {
-      messagesStore.deleteAllMessages()
+      messagesStore.deleteAllMessages();
     };
+
+    onUnmounted(() => {
+      if (ws.value) {
+        ws.value.close();
+      }
+    });
 
     return {
       messagesStore,
