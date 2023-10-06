@@ -2,14 +2,15 @@ import { defineStore } from 'pinia'
 
 export const useMessagesStore = defineStore('messages', {
     state: () => ({
-        messages: JSON.parse(localStorage.getItem('messages')) || []
+        messages: JSON.parse(localStorage.getItem('messages')) || [],
+        userId: Math.random().toString(36).substr(2, 9)
     }),
     actions: {
-        addMessage(content) {
+        addMessage(content, userId) {
             this.messages.push({
                 id: Date.now(),
                 content: content,
-                isOwn: true
+                userId: userId
             });
             this.saveToLocalStorage();
         },

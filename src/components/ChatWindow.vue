@@ -1,9 +1,14 @@
 <template>
   <div class="chat-window q-mx-md">
     <div class="messages">
-      <MessageBox v-for="message in messagesStore.messages" :key="message.id" :message="message" :isOwn="message.isOwn" @delete="deleteMessage" />
+      <MessageBox v-for="message in messagesStore.messages"
+                  :key="message.id"
+                  :message="message"
+                  :isOwn="message.userId === messagesStore.userId"
+                  @delete="deleteMessage" />
     </div>
-    <ChatInput @send="addMessage" @deleteAll="deleteAllMessages" />
+    <ChatInput @send="content => addMessage(content, messagesStore.userId)"
+               @deleteAll="deleteAllMessages" />
   </div>
 </template>
 
@@ -23,8 +28,8 @@ export default defineComponent({
   setup() {
     const messagesStore = useMessagesStore();
 
-    const addMessage = (content) => {
-      messagesStore.addMessage(content);
+    const addMessage = (content, userId) => {
+      messagesStore.addMessage(content, userId);
     };
 
     const deleteMessage = (id) => {

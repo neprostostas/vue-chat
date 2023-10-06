@@ -50,6 +50,7 @@ export default defineComponent({
 }
 .own-message {
   background-color: #a1d4ff;
+  margin-left: auto;
 }
 .button-delete {
   margin: 0 10px;
